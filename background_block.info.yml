@@ -1,0 +1,5 @@
+name: 'Background Block'
+type: module
+description: 'Add a background style to the blocks'
+core: 8.x
+package: 'MM'

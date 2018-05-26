@@ -1,0 +1,220 @@
+<?php
+
+/**
+ * @file
+ * Module for adding classes and bakcgournd images to blocks.
+ */
+
+use Drupal\block\Entity\Block;
+use \Drupal\file\Entity\File;
+use Drupal\Component\Render\FormattableMarkup;
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function background_block_form_block_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id) {
+
+  // if use have access to administer block bgi permission
+  if (\Drupal::currentUser()->hasPermission('administer block bgi')) {
+
+    // This will automatically be saved in the third party settings.
+    $form['third_party_settings']['#tree'] = TRUE;
+
+    /** @var \Drupal\block\BlockInterface $block */
+    $block = $form_state->getFormObject()->getEntity();
+
+    // Element bg_settings details
+    $form['third_party_settings']['background_block']['bg_settings']= [
+      '#type' => 'details',
+      '#title' => t('Background settings'),
+      '#open' => FALSE,
+      '#weight' => -59,
+    ];
+    ksm($block->getThirdPartySetting('background_block', 'bg_settings'));
+
+    // Element form bg active
+    $active = $block->getThirdPartySetting('background_block', 'bg_settings')['bgi_active'];
+    $default_active = ($active != null) ? $active : 0;
+    $form['third_party_settings']['background_block']['bg_settings']['bgi_active'] = array(
+      '#type' => 'radios',
+      '#title' => t('Active Background settings'),
+      '#options' => [0 => t('Closed'), 1 => t('Active')],
+      '#description' => t("Active the background image and color settings"),
+      '#default_value' => $default_active,
+    );
+    
+    // Element form bg image
+    $form['third_party_settings']['background_block']['bg_settings']['bgi'] = array(
+      '#type' => 'managed_file',
+      '#upload_location' => 'public://background-block/images/',
+      '#title' => t('Image'),
+      '#description' => t("Image to show on the background"),
+      '#default_value' => $block->getThirdPartySetting('background_block', 'bg_settings')['bgi'],
+      '#upload_validators' => array(
+        'file_validate_extensions' => array('gif png jpg jpeg'),
+      ),
+    );
+
+    // Element form bg color
+    $form['third_party_settings']['background_block']['bg_settings']['bgc'] = array(
+      '#type' => 'color',
+      '#title' => t('Background color'),
+      '#default_value' => '#ffffff',
+      '#description' => t("Color to show on the background"),
+      '#default_value' => $block->getThirdPartySetting('background_block', 'bg_settings')['bgc'],
+    );
+
+    // Element form bg size
+    $size = $block->getThirdPartySetting('background_block', 'bg_settings')['size'];
+    $default_size = ($size != null) ? $size : 0;
+    $form['third_party_settings']['background_block']['bg_settings']['size'] = array(
+      '#type' => 'select',
+      '#title' => t('Background size'),
+      '#options' => [
+        'cover' => t('Cover'),
+        'auto' => t('Auto'),
+      ],
+      '#default_value' => $default_size,
+      '#description' => t("set Background size : cover for block orckester, auto for image orckester."),
+    );
+
+    // Element form bg attachment
+    $attachment = $block->getThirdPartySetting('background_block', 'bg_settings')['attachment'];
+    $default_attachment = ($attachment != null) ? $attachment : 'scroll';
+    $form['third_party_settings']['background_block']['bg_settings']['attachment'] = array(
+      '#type' => 'select',
+      '#title' => t('Background attachment'),
+      '#options' => [
+        'fixed' => t('Fixed'),
+        'scroll' => t('Scroll'),
+      ],
+      '#default_value' => $default_attachment,
+      '#description' => t("set Background attachment :fixed or scroll."),
+    );
+
+    // Element form bg repeat
+    $repeat = $block->getThirdPartySetting('background_block', 'bg_settings')['repeat'];
+    $default_repeat = ($repeat != null) ? $repeat : 'no-repeat';
+    $form['third_party_settings']['background_block']['bg_settings']['repeat'] = array(
+      '#type' => 'select',
+      '#title' => t('Background repeat'),
+      '#options' => [
+        'no-repeat' => t('No-repeat'),
+        'repeat' => t('Repeat'),
+      ],
+      '#default_value' => $default_repeat,
+      '#description' => t("set Background repeat/no-repeat."),
+    );
+
+    // Element form bg posiiton-x
+    $positionx = $block->getThirdPartySetting('background_block', 'bg_settings')['positionx'];
+    $default_positionx = ($positionx != null) ? $positionx : 'left';
+    $form['third_party_settings']['background_block']['bg_settings']['positionx'] = array(
+      '#type' => 'select',
+      '#title' => t('Background-position x'),
+      '#options' => [
+        'left' => t('left'),
+        'center' => t('center'),
+        'right' => t('right'),
+      ],
+      '#default_value' => $default_positionx,
+      '#description' => t("set Background-position x"),
+    );
+
+    // Element form bg posiiton-y
+    $positionz = $block->getThirdPartySetting('background_block', 'bg_settings')['positionz'];
+    $default_positionz = ($positionz != null) ? $positionz : 'top';
+    $form['third_party_settings']['background_block']['bg_settings']['positionz'] = array(
+      '#type' => 'select',
+      '#title' => t('Background-position z'),
+      '#options' => [
+        'top' => t('top'),
+        'center' => t('center'),
+        'bottom' => t('bottom'),
+      ],
+      '#default_value' => $default_positionz,
+      '#description' => t("set Background-position z"),
+    );
+
+    // Element form padding
+    $padding = $block->getThirdPartySetting('background_block', 'bg_settings')['padding'];
+    $default_padding = ($padding != null) ? $padding : 0;
+    $form['third_party_settings']['background_block']['bg_settings']['padding'] = array(
+      '#type' => 'select',
+      '#title' => t('Padding'),
+      '#options' => [
+        0 => t('0 px'),
+        10 => t('10 px'),
+        15 => t('15 px'),
+        20 => t('20 px'),
+        25 => t('25 px'),
+        30 => t('30 px'),
+        35 => t('35 px'),
+        40 => t('40 px'),
+        45 => t('45 px'),
+        50 => t('50 px'),
+        60 => t('60 px'),
+        70 => t('70 px'),
+        80 => t('80 px'),
+        90 => t('90 px'),
+        100 => t('100 px'),
+        150 => t('150 px'),
+        200 => t('200 px'),
+        250 => t('250 px'),
+        300 => t('300 px'),
+      ],
+      '#default_value' => $default_padding,
+      '#description' => t("Padding Block"),
+    );
+
+  }
+}
+
+/**
+ * Implements hook_preprocess_HOOK().
+ */
+function background_block_preprocess_block(&$variables) {
+  // Blocks coming from page manager widget does not have id.
+  if (!empty($variables['elements']['#id'])) {
+    $block = Block::load($variables['elements']['#id']);
+    if ($bg_settings = $block->getThirdPartySetting('background_block', 'bg_settings')) {
+      $active = (int)$bg_settings['bgi_active'];
+      if ($active != 0) {
+        // ksm($bg_settings);
+        $url_fichier = null;
+        $bgi = (int)$bg_settings['bgi'][0];
+        $bgc = (string)$bg_settings['bgc'];
+        $padding = (int)$bg_settings['padding'];
+        $size = (string)$bg_settings['size'];
+        $repeat = (string)$bg_settings['repeat'];
+        $attachment = (string)$bg_settings['attachment'];
+        $positionx = (string)$bg_settings['positionx'];
+        $positionz = (string)$bg_settings['positionz'];
+        $position = ($size == 'auto') ? $positionx . ' ' . $positionz : 'center';
+        // Check if array settings is not empty
+        if ($bgi) {
+          // Prepare the file
+          $file =  File::load($bgi);
+          // Check if is a file
+          if ($file) {
+            $url_fichier = 'url(' . $file->url() . ')';
+          }
+        }
+        // Clean the render
+        $image = new FormattableMarkup('margin:0;padding:@paddingpx !important;background:@color @image @repeat @position @attachment;-webkit-background-size: @size;background-size: @size;', [
+          '@image' => $url_fichier,
+          '@padding' => $padding,
+          '@size' => $size,
+          '@color' => $bgc,
+          '@repeat' => $repeat,
+          '@position' => $position,
+          '@attachment' => $attachment,
+        ]);
+        // Set variables attributes
+        $variables['attributes']['style'][] = $image;
+      }
+    }
+  }
+}
+
+

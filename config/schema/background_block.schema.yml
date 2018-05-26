@@ -1,0 +1,33 @@
+block.block.*.third_party.background_block:
+  type: mapping
+  label: Background block third party settings
+  mapping:
+    bgi_active:
+      type: integer
+      label: Background settings active
+    bgi:
+      type: sequence
+      label: Additional background-image for the block
+      sequence:
+        type: integer
+    bgc:
+      type: string
+      label: Additional background color for the block
+    attachment:
+      type: string
+      label: Additional background-attachment
+    repeat:
+      type: string
+      label: Additional background-repeat
+    positionx:
+      type: string
+      label: Additional background-position x
+    positionz:
+      type: string
+      label: Additional background-position y
+    size:
+      type: string
+      label: Additional background-size
+    padding:
+      type: integer
+      label: Additional padding for the block
