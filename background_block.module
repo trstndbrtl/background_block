@@ -30,7 +30,6 @@ function background_block_form_block_form_alter(&$form, \Drupal\Core\Form\FormSt
       '#open' => FALSE,
       '#weight' => -59,
     ];
-    ksm($block->getThirdPartySetting('background_block', 'bg_settings'));
 
     // Element form bg active
     $active = $block->getThirdPartySetting('background_block', 'bg_settings')['bgi_active'];
@@ -89,7 +88,7 @@ function background_block_form_block_form_alter(&$form, \Drupal\Core\Form\FormSt
         'scroll' => t('Scroll'),
       ],
       '#default_value' => $default_attachment,
-      '#description' => t("set Background attachment :fixed or scroll."),
+      '#description' => t("set Background attachment :fixed or scroll. "),
     );
 
     // Element form bg repeat
@@ -180,7 +179,7 @@ function background_block_preprocess_block(&$variables) {
     if ($bg_settings = $block->getThirdPartySetting('background_block', 'bg_settings')) {
       $active = (int)$bg_settings['bgi_active'];
       if ($active != 0) {
-        // ksm($bg_settings);
+        // Check variable settings
         $url_fichier = null;
         $bgi = (int)$bg_settings['bgi'][0];
         $bgc = (string)$bg_settings['bgc'];
