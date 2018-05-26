@@ -181,7 +181,7 @@ function background_block_preprocess_block(&$variables) {
       if ($active != 0) {
         // Check variable settings
         $url_fichier = null;
-        $bgi = (int)$bg_settings['bgi'][0];
+        $bgi = (isset($bg_settings['bgi'][0])) ? (int)$bg_settings['bgi'][0] : null;
         $bgc = (string)$bg_settings['bgc'];
         $padding = (int)$bg_settings['padding'];
         $size = (string)$bg_settings['size'];
