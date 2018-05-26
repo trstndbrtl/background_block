@@ -8,6 +8,6 @@ Install the module then go to the page of an administration block. -> `/admin/st
 ### Configuration
 The configuration is done in the administration of the block.
 
-![More configuration](http://data.revuesdecode.com/revues/module/background_block/backblock-settings.png)
+![More configuration](http://data.revuesdecode.com/revues/module/background-block/backblock-settings.png)
 
 Enjoy!
