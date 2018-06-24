@@ -6,13 +6,14 @@
  */
 
 use Drupal\block\Entity\Block;
-use \Drupal\file\Entity\File;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\file\Entity\File;
 use Drupal\Component\Render\FormattableMarkup;
 
 /**
  * Implements hook_form_FORM_ID_alter().
  */
-function background_block_form_block_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id) {
+function background_block_form_block_form_alter(&$form, FormStateInterface $form_state, $form_id) {
 
   // if use have access to administer block bgi permission
   if (\Drupal::currentUser()->hasPermission('administer block bgi')) {
@@ -166,6 +167,42 @@ function background_block_form_block_form_alter(&$form, \Drupal\Core\Form\FormSt
       '#description' => t("Padding Block"),
     );
 
+    foreach (array_keys($form['actions']) as $action) {
+      if ($action != 'preview' && isset($form['actions'][$action]['#type']) && $form['actions'][$action]['#type'] === 'submit') {
+        $form['actions'][$action]['#submit'][] = 'background_block_form_block_submit';
+      }
+    }
+  }
+}
+
+/**
+ * Implements background_block_form_block_submit().
+ * @params $form
+ * @params FormStateInterface $form_state
+ */
+function background_block_form_block_submit(array $form, FormStateInterface $form_state){
+  // We do not want orphan image, prepare the fid of the current image, if there is one
+  $current_fid = $form['third_party_settings']['background_block']['bg_settings']['bgi']['#default_value'][0];
+  // get the image background block field
+  $image = $form_state->getValue('third_party_settings')['background_block']['bg_settings']['bgi'][0];
+  // If an image valid in the form run image archive process
+  // ElseIf, no image, but a default referensed image (we come to delete an image), so, delete it.
+  if ($image) {
+    // Load the object of the image file by it's fid
+    $file = File::load($image);
+    // Check if file is permanent
+    if ($file->isTemporary()) {
+      // Set the status flag permanent of the image file object
+      $file->setPermanent();
+      // Save the file in database ( "managed_file" table)
+      $file->save();
+      // Let's check if the image has changed
+      if ($current_fid && ($current_fid != $image)) {
+        file_delete($current_fid);
+      }
+    }
+  } elseif ($current_fid && (is_null($image))) {
+    file_delete($current_fid);
   }
 }
 
